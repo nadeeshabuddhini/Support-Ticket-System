@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
@@ -12,7 +15,17 @@ class TicketController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            $tickets = Ticket::with('user')->latest()->get();
+        } else {
+            $tickets = Ticket::where('user_id', $user->id)->latest()->get();
+        }
+
+        return Inertia::render('Tickets/Index', [
+            'tickets' => $tickets,
+        ]);
     }
 
     /**
@@ -28,7 +41,23 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string|max:255',
+            'priority' => 'required|string|max:255',
+        ]);
+
+        $ticket = Ticket::create([
+            'user_id' => Auth::id(),
+            'subject' => $request->subject,
+            'description' => $request->description,
+            'category' => $request->category,
+            'priority' => $request->priority,
+            'status' => 'Open',
+        ]);
+
+        return redirect()->route('tickets.index')->with('success', 'Ticket created successfully.');
     }
 
     /**
@@ -36,7 +65,16 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
-        //
+        $ticket->load(['user', 'comments.user']); // load ticket creator + comments with commenter
+
+        // Only ticket owner or admin can view
+        if (Auth::user()->hasRole('admin') || $ticket->user_id == Auth::id()) {
+            return Inertia::render('Tickets/Show', [
+                'ticket' => $ticket,
+            ]);
+        } else {
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     /**
@@ -50,9 +88,21 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Ticket $ticket)
+    public function updateStatus(Request $request, Ticket $ticket)
     {
-        //
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Only admins can update ticket status.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:Open,In Progress,Resolved',
+        ]);
+
+        $ticket->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Ticket status updated.');
     }
 
     /**
@@ -62,4 +112,25 @@ class TicketController extends Controller
     {
         //
     }
+
+    public function addComment(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'message' => 'required|string',
+        ]);
+
+        if (Auth::user()->hasRole('admin') || $ticket->user_id == Auth::id()) {
+            Comment::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'message' => $request->message,
+            ]);
+
+            return redirect()->back()->with('success', 'Comment added.');
+        } else {
+            abort(403, 'Unauthorized action.');
+        }
+    }
 }
+
+
