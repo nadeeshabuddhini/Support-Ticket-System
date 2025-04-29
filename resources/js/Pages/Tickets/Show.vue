@@ -6,14 +6,11 @@
       <h2 class="text-xl font-semibold mb-2">{{ ticket.subject }}</h2>
       <p class="text-gray-700 mb-2"><strong>Category:</strong> {{ ticket.category }}</p>
       <p class="text-gray-700 mb-2"><strong>Priority:</strong> {{ ticket.priority }}</p>
-      <p class="text-gray-700 mb-2"><strong>Status:</strong> {{ ticket.status }}</p>
-      <p class="text-gray-700 mb-2"><strong>Description:</strong></p>
-      <p class="text-gray-600">{{ ticket.description }}</p>
 
-      <!-- Admin Only: Update Ticket Status -->
-      <div v-if="isAdmin" class="mt-6">
+      <!-- Status Dropdown (Admin + User both) -->
+      <div class="mt-4">
         <form @submit.prevent="updateStatus">
-          <label class="block mb-2 font-semibold">Update Status:</label>
+          <label class="block mb-2 font-semibold">Status:</label>
           <select v-model="statusForm.status" class="w-full border rounded p-2 mb-4">
             <option value="Open">Open</option>
             <option value="In Progress">In Progress</option>
@@ -29,6 +26,9 @@
           </button>
         </form>
       </div>
+
+      <p class="text-gray-700 mb-2 mt-4"><strong>Description:</strong></p>
+      <p class="text-gray-600">{{ ticket.description }}</p>
     </div>
 
     <!-- Comments Section -->
@@ -73,12 +73,8 @@
 </template>
 
 <script setup>
-import { useForm, router, usePage } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-
-const page = usePage();
-console.log(page.props.auth.user);
-const isAdmin = page.props.auth.user.roles.includes('admin');
 
 const props = defineProps({
   ticket: Object,
@@ -91,7 +87,7 @@ const form = useForm({
 
 // Form for updating status
 const statusForm = useForm({
-  status: props.ticket.status, // Set current status initially
+  status: props.ticket.status, // Set initial status
 });
 
 // Submit Comment
@@ -108,7 +104,8 @@ function submit() {
 function updateStatus() {
   statusForm.put(route('tickets.updateStatus', props.ticket.id), {
     onSuccess: () => {
-      router.reload({ only: ['ticket'] });
+      alert('Status updated successfully!'); // <-- show alert
+      router.reload({ only: ['ticket'] });    // reload ticket to update view
     },
   });
 }

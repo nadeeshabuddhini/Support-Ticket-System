@@ -1,6 +1,19 @@
 <template>
   <div class="p-6">
     <h1 class="text-2xl font-bold mb-6">Tickets</h1>
+    <div class="flex justify-between items-center mb-6">
+  <div class="text-lg font-semibold text-gray-700">
+    Welcome, {{ page.props.auth.user.name }}
+  </div>
+  <Link
+    href="/logout"
+    method="post"
+    as="button"
+    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+  >
+    Logout
+  </Link>
+</div>
 
     <!-- Create Ticket Button (only for normal users) -->
     <div class="flex justify-end mb-6" v-if="!isAdmin">
@@ -10,6 +23,39 @@
       >
         Create Ticket
       </Link>
+    </div>
+
+     <!-- Filters -->
+    <div class="flex gap-4 mb-6">
+      <!-- Status Filter -->
+      <div>
+        <label for="status" class="block text-sm font-medium text-gray-700">Filter by Status</label>
+        <select
+          id="status"
+          v-model="filters.status"
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+        >
+          <option value="">All</option>
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <!-- Priority Filter -->
+      <div>
+        <label for="priority" class="block text-sm font-medium text-gray-700">Filter by Priority</label>
+        <select
+          id="priority"
+          v-model="filters.priority"
+          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+        >
+          <option value="">All</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
     </div>
 
     <!-- Ticket List -->
@@ -25,7 +71,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="ticket in tickets" :key="ticket.id" class="border-b">
+          <tr v-for="ticket in filteredTickets" :key="ticket.id" class="border-b">
             <td class="py-3 px-4">{{ ticket.subject }}</td>
             <td class="py-3 px-4">{{ ticket.category }}</td>
             <td class="py-3 px-4">{{ ticket.priority }}</td>
@@ -58,6 +104,7 @@
 
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
+import { reactive, computed } from 'vue';
 
 
 // Get user roles from shared props
@@ -65,7 +112,21 @@ const page = usePage();
 
 const isAdmin = page.props.auth.user.roles.includes('admin');
 
-defineProps({
-  tickets: Array
+const props = defineProps({
+  tickets: Array, // Correctly define tickets as an array
+});
+// Filters
+const filters = reactive({
+  status: '',
+  priority: '',
+});
+
+// Computed property to filter tickets
+const filteredTickets = computed(() => {
+  return props.tickets.filter((ticket) => {
+    const matchesStatus = !filters.status || ticket.status === filters.status;
+    const matchesPriority = !filters.priority || ticket.priority === filters.priority;
+    return matchesStatus && matchesPriority;
+  });
 });
 </script>

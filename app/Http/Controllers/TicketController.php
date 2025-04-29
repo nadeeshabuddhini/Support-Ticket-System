@@ -90,18 +90,14 @@ class TicketController extends Controller
      */
     public function updateStatus(Request $request, Ticket $ticket)
     {
-        if (!Auth::user()->hasRole('admin')) {
-            abort(403, 'Only admins can update ticket status.');
-        }
-
         $request->validate([
             'status' => 'required|in:Open,In Progress,Resolved',
         ]);
-
+    
         $ticket->update([
             'status' => $request->status,
         ]);
-
+    
         return redirect()->back()->with('success', 'Ticket status updated.');
     }
 
