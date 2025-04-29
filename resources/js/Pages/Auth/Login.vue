@@ -34,7 +34,7 @@ const submit = () => {
 
     <AuthenticationCard>
         <template #logo>
-            <AuthenticationCardLogo />
+            <img src="/assets/user_logo.png" alt="User Logo" class="w-32 h-auto mx-auto" />
         </template>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">

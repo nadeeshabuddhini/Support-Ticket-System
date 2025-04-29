@@ -28,7 +28,7 @@ const submit = () => {
 
     <AuthenticationCard>
         <template #logo>
-            <AuthenticationCardLogo />
+             <img src="/assets/user_logo.png" alt="User Logo" class="w-32 h-auto mx-auto" />
         </template>
 
         <form @submit.prevent="submit">

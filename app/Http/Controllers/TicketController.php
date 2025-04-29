@@ -122,7 +122,7 @@ class TicketController extends Controller
                 'message' => $request->message,
             ]);
 
-            return redirect()->back()->with('success', 'Comment added.');
+            return redirect()->route('tickets.index')->with('success', 'Comment added.');
         } else {
             abort(403, 'Unauthorized action.');
         }

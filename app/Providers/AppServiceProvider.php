@@ -21,17 +21,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
 {
-    // Inertia::share(function () {
-    //     return [
-    //         'auth' => [
-    //             'user' => Auth::user() ? array_merge(
-    //                 Auth::user()->only('id', 'name', 'email'),
-    //                 [
-    //                     'roles' => Auth::user()->getRoleNames(),
-    //                 ]
-    //             ) : null,
-    //         ],
-    //     ];
-    // });
+    Inertia::share([
+        'auth' => [
+            'user' => function () {
+                if (Auth::check()) {
+                    return [
+                        'id' => Auth::user()->id,
+                        'name' => Auth::user()->name,
+                        'email' => Auth::user()->email,
+                        'roles' => Auth::user()->getRoleNames()->toArray(), // <-- only role names like ["admin"]
+                    ];
+                }
+                return null;
+            },
+        ],
+    ]);
+    
 }
 }
