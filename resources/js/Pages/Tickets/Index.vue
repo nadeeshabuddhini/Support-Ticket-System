@@ -119,25 +119,16 @@ import Button from '@/Components/Button.vue';
 import Navbar from '@/Components/Navbar.vue';
 
 
+const props = defineProps({
+  tickets: Array, 
+});
 
-
-// Get user roles from shared props
 const page = usePage();
 
 const isAdmin = computed(() => {
   return page.props.user.roles.includes('admin');
 });
-console.log('User roles:', page.props.auth.user.roles);
-const props = defineProps({
-  tickets: Array, // Correctly define tickets as an array
-});
-// Filters
-const filters = reactive({
-  status: '',
-  priority: '',
-});
 
-// Computed property to filter tickets
 const filteredTickets = computed(() => {
   return props.tickets.filter((ticket) => {
     const matchesStatus = !filters.status || ticket.status === filters.status;
@@ -145,4 +136,14 @@ const filteredTickets = computed(() => {
     return matchesStatus && matchesPriority;
   });
 });
+
+
+// Filters
+const filters = reactive({
+  status: '',
+  priority: '',
+});
+
+// Computed property to filter tickets
+
 </script>
