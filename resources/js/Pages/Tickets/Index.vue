@@ -124,6 +124,10 @@ const props = defineProps({
 });
 
 const page = usePage();
+const filters = reactive({
+  status: '',
+  priority: '',
+});
 
 const isAdmin = computed(() => {
   return page.props.user.roles.includes('admin');
@@ -135,15 +139,6 @@ const filteredTickets = computed(() => {
     const matchesPriority = !filters.priority || ticket.priority === filters.priority;
     return matchesStatus && matchesPriority;
   });
-});
-
-
-// Filters
-const filters = reactive({
-  status: '',
-  priority: '',
-});
-
-// Computed property to filter tickets
+})
 
 </script>
