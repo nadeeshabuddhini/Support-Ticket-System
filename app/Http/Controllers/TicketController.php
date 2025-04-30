@@ -13,6 +13,8 @@ class TicketController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     //list tickets
     public function index()
     {
         $user = Auth::user();
@@ -25,6 +27,10 @@ class TicketController extends Controller
 
         return Inertia::render('Tickets/Index', [
             'tickets' => $tickets,
+            'user' => [
+            'name' => $user->name,
+            'roles' => $user->roles->pluck('name')->toArray(), 
+        ]
         ]);
     }
 
@@ -39,6 +45,8 @@ class TicketController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    //create ticket 
     public function store(Request $request)
     {
         $request->validate([
@@ -63,6 +71,7 @@ class TicketController extends Controller
     /**
      * Display the specified resource.
      */
+    //show single tickert and comments
     public function show(Ticket $ticket)
     {
         $ticket->load(['user', 'comments.user']); // load ticket creator + comments with commenter
@@ -88,6 +97,7 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    //update ticket status
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -97,7 +107,7 @@ class TicketController extends Controller
         $ticket->update([
             'status' => $request->status,
         ]);
-    
+
         return redirect()->back()->with('success', 'Ticket status updated.');
     }
 
@@ -108,7 +118,7 @@ class TicketController extends Controller
     {
         //
     }
-
+    //add comment to ticket
     public function addComment(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -121,8 +131,7 @@ class TicketController extends Controller
                 'user_id' => Auth::id(),
                 'message' => $request->message,
             ]);
-
-            return redirect()->route('tickets.index')->with('success', 'Comment added.');
+            return redirect()->back()->with('success', 'Comment added.');
         } else {
             abort(403, 'Unauthorized action.');
         }

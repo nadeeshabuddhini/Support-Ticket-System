@@ -1,18 +1,19 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Navbar -->
-    <nav class="flex justify-end p-4 md:p-6 space-x-2 md:space-x-4 shadow mb-6 bg-gradient-to-r from-blue-600 via-blue-200 to-purple-600">
-      <Link :href="route('login')" class="px-4 md:px-6 py-2 font-semibold bg-blue-600 text-white rounded hover:bg-blue-700">Login</Link>
-      <Link :href="route('register')" class="px-4 md:px-6 py-2 font-semibold bg-blue-600 text-white rounded hover:bg-blue-700">Register</Link>
-    </nav>
+    <Navbar>
+      <Button :value="'Login'" :href="route('login')"/>
+      <Button :value="'Register'" :href="route('register')"/>
+    </Navbar>
+   
 
     <!-- Content Area -->
     <div class="flex flex-col md:flex-row flex-1">
       <!-- Left side: Image -->
       <div
         class="w-full md:w-1/2 h-64 md:h-auto bg-cover bg-center"
-        :style="{ backgroundImage: 'url(/assets/home-bg.jpg)' }"
-      ></div>
+        :style="{ backgroundImage: 'url(/assets/home-bg.jpg)' }">
+      </div>
 
       <!-- Right side: Text Content -->
       <div class="w-full md:w-1/2 flex flex-col justify-center p-6 md:px-12">
@@ -32,8 +33,10 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import Button from '@/Components/Button.vue';
+import Navbar from '@/Components/Navbar.vue';
 </script>
 
 <style scoped>
-/* no extra css */
+
 </style>

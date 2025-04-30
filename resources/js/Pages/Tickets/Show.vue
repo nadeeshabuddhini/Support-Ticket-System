@@ -26,13 +26,10 @@
               <option value="In Progress">In Progress</option>
               <option value="Resolved">Resolved</option>
             </select>
-            <button
-              type="submit"
-              class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition duration-200"
-              :disabled="statusForm.processing"
-            >
-              Update Status
-            </button>
+      
+            <FormButton :disabled="statusForm.processing">
+                Update Status
+            </FormButton>
             <div v-if="showStatusMessage" class="text-green-600 text-sm mt-2">
                 Status updated successfully!
             </div>
@@ -79,14 +76,20 @@
             placeholder="Type your comment..."
           ></textarea>
           <div v-if="form.errors.message" class="text-red-500 text-sm">{{ form.errors.message }}</div>
-          <button
-            type="submit"
-            class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition duration-200"
-            :disabled="form.processing"
-          >
+
+          <FormButton :disabled="form.processing">
             Submit Comment
-          </button>
+          </FormButton>
         </form>
+      </div>
+
+      <div class="flex justify-end mb-4">
+        <Link
+          :href="route('tickets.index')"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+        >
+          ← Go Back
+        </Link>
       </div>
 
     </div>
@@ -98,6 +101,9 @@
 import { useForm, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import FormButton from '@/Components/FormButton.vue';
+
 
 const showStatusMessage = ref(false);
 
@@ -112,26 +118,30 @@ const form = useForm({
 
 // Form for updating status
 const statusForm = useForm({
-  status: props.ticket.status, // Set initial status
+  status: props.ticket.status, 
 });
 
-// Submit Comment
+
 function submit() {
   form.post(route('tickets.addComment', props.ticket.id), {
+    preserveScroll: true,     
+    preserveState: true,      
+    only: ['ticket', 'success'],  
     onSuccess: () => {
-      form.reset();
-      // router.reload({ only: ['ticket'] });
-      router.visit('/tickets');
+      form.reset(); 
     },
   });
 }
 
+
 // Update Ticket Status
 function updateStatus() {
   statusForm.put(route('tickets.updateStatus', props.ticket.id), {
+    preserveScroll: true,     
+    preserveState: true,
     onSuccess: () => {
       showStatusMessage.value = true;
-      setTimeout(() => (showStatusMessage.value = false), 3000); // auto-hide after 3s
+      setTimeout(() => (showStatusMessage.value = false), 3000); 
       router.reload({ only: ['ticket'] });
     },
   });

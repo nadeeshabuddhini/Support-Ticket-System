@@ -50,13 +50,9 @@
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"
-              :disabled="form.processing"
-            >
+            <FormButton :disabled="form.processing">
               Submit
-            </button>
+            </FormButton>
           </div>
         </form>
       </div>
@@ -67,6 +63,7 @@
 
 <script setup>
 import { useForm } from '@inertiajs/vue3';
+import FormButton from '@/Components/FormButton.vue';
 
 const form = useForm({
   subject: '',
