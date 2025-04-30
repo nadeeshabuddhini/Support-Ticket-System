@@ -31,16 +31,23 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    //new added
     Route::get('/tickets/create', function () {
+        if (auth()->user()->hasRole('admin')) {
+            abort(403, 'Admins are not allowed to create tickets.');
+        }
         return Inertia::render('Tickets/Create');
     })->name('tickets.create');
+    // Route::get('/tickets/create', function () {
+    //     return Inertia::render('Tickets/Create');
+    // })->name('tickets.create');
     Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
     Route::put('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])->name('tickets.updateStatus');
     Route::post('/tickets/{ticket}/comment', [TicketController::class, 'addComment'])->name('tickets.addComment');
 });
 // Route::get('/make-admin', function () {
-//     $user = User::find(2); // replace 1 with your user ID
+//     $user = User::find(5);
 //     $user->assignRole('admin');
 //     return 'User promoted to admin!';
 // });
